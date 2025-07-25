@@ -91,6 +91,11 @@ const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
 
+    // Prevent default scrolling behavior for radio buttons and checkboxes
+    if (type === 'radio' || type === 'checkbox') {
+      e.preventDefault()
+    }
+
     if (name === "areasOfExpertise") {
       const currentAreas = formData.areasOfExpertise || []
       if (checked) {
@@ -106,6 +111,24 @@ const RegisterPage = () => {
           .map((d) => d.trim())
           .filter((d) => d),
       })
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
+  }
+
+  // Custom click handler for radio buttons and checkboxes to prevent scrolling
+  const handleInteractiveClick = (e, name, value, type = 'radio') => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (type === 'checkbox') {
+      const currentAreas = formData.areasOfExpertise || []
+      const isChecked = currentAreas.includes(value)
+      if (isChecked) {
+        setFormData({ ...formData, areasOfExpertise: currentAreas.filter((area) => area !== value) })
+      } else {
+        setFormData({ ...formData, areasOfExpertise: [...currentAreas, value] })
+      }
     } else {
       setFormData({ ...formData, [name]: value })
     }
@@ -261,14 +284,16 @@ const RegisterPage = () => {
                         ? "border-cyan-500 bg-cyan-50 text-cyan-700"
                         : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
                     }`}
+                    onClick={(e) => handleInteractiveClick(e, 'roleLevel', level)}
                   >
                     <input
                       type="radio"
                       name="roleLevel"
                       value={level}
                       checked={formData.roleLevel === level}
-                      onChange={handleChange}
+                      onChange={() => {}} // Handled by onClick
                       className="sr-only"
+                      tabIndex={-1}
                     />
                     <div className="text-center">
                       <div className="font-medium capitalize">{t(`registerPage.roleLevels.${level}`)}</div>
@@ -312,14 +337,16 @@ const RegisterPage = () => {
                         ? "border-cyan-500 bg-cyan-50 text-cyan-700"
                         : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
                     }`}
+                    onClick={(e) => handleInteractiveClick(e, 'areasOfExpertise', area, 'checkbox')}
                   >
                     <input
                       type="checkbox"
                       name="areasOfExpertise"
                       value={area}
                       checked={formData.areasOfExpertise.includes(area)}
-                      onChange={handleChange}
+                      onChange={() => {}} // Handled by onClick
                       className="sr-only"
+                      tabIndex={-1}
                     />
                     <span className="text-sm font-medium">{t(`registerPage.expertiseAreas.${area}`)}</span>
                   </label>
@@ -363,14 +390,16 @@ const RegisterPage = () => {
                         ? "border-cyan-500 bg-cyan-50 text-cyan-700"
                         : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
                     }`}
+                    onClick={(e) => handleInteractiveClick(e, 'status', status)}
                   >
                     <input
                       type="radio"
                       name="status"
                       value={status}
                       checked={formData.status === status}
-                      onChange={handleChange}
+                      onChange={() => {}} // Handled by onClick
                       className="sr-only"
+                      tabIndex={-1}
                     />
                     <div className="text-center">
                       <div className="font-medium capitalize">{t(`registerPage.statuses.${status}`)}</div>
@@ -411,9 +440,9 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 flex items-center justify-center">
-      <div className="w-full max-w-6xl mx-auto flex rounded-2xl shadow-2xl overflow-hidden glass-card h-[90vh]">
+      <div className="w-full max-w-6xl mx-auto flex rounded-2xl shadow-2xl overflow-hidden glass-card h-[90vh] max-h-[90vh]">
         {/* Left side - Image */}
-        <div className="hidden lg:block lg:w-2/5 relative flex-shrink-0">
+        <div className="hidden lg:block lg:w-2/5 relative flex-shrink-0 h-full">
           <img
             src="/login-background.png"
             alt="Community hands together, a sign of unity and support"
@@ -444,7 +473,7 @@ const RegisterPage = () => {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto px-8 lg:px-12">
+          <div className="flex-1 overflow-y-auto px-8 lg:px-12 scroll-smooth" style={{ scrollBehavior: 'smooth' }}>
             <form onSubmit={handleSubmit} className="space-y-6 pb-8">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-3">{t("registerPage.selectRole")}</label>
@@ -462,14 +491,16 @@ const RegisterPage = () => {
                           ? "border-cyan-500 bg-cyan-50 text-cyan-700"
                           : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
                       }`}
+                      onClick={(e) => handleInteractiveClick(e, 'role', role.value)}
                     >
                       <input
                         type="radio"
                         name="role"
                         value={role.value}
                         checked={formData.role === role.value}
-                        onChange={handleChange}
+                        onChange={() => {}} // Handled by onClick
                         className="sr-only"
+                        tabIndex={-1}
                       />
                       <div className="flex-shrink-0">{role.icon}</div>
                       <div>
